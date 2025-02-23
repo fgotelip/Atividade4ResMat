@@ -83,7 +83,6 @@ class Carregamento():
                 print("M2",self.__m2)
     
     def __gera_vx(self,vant,tamAnt): ## Função para calcular o cortante
-        
         if isinstance(vant,sp.Basic): ## Confere se é função
             vant = vant.subs(self.__x,tamAnt) ## Cortante anterior
 
@@ -98,6 +97,7 @@ class Carregamento():
                 else: 
                     self.__v = v
                     self.__v2 = v2
+
             elif self.__tipo == 4: ## Carga Momento
                 self.__v = v
 
@@ -113,7 +113,7 @@ class Carregamento():
         m = sp.integrate(self.__v,self.__x) + mant
 
         if self.__tipo == 2 or self.__tipo == 4: ## Carregamento pontual ou momento
-            if self.__tipo == 2 and self.__v2 != None: ## Carregamento pontual
+            if self.__v2 != None: ## Se houver segundo cortante
                 mant2 = m.subs(self.__x,self.__pos)
                 m2 = sp.integrate(self.__v2,self.__x) + mant2
             elif self.__tipo == 4: ## Carga Momento
@@ -122,7 +122,11 @@ class Carregamento():
                 m2 = m.subs(termo_independente,mant2+self.__momento) ## Calcula o segundo fletor subtraindo o termo independente
 
             if self.__pos == 0: ## Se a força(ou o momento) está no início da barra
-                self.__m = m
+                if self.__v2 == None: ## Se não houver segundo cortante
+                    self.__m = m
+                else: ## Se houver segundo cortante
+                    self.__m = m2
+                    
             elif self.__pos == self.__tam: ## Se a força(ou o momento) está no final da barra
                 self.__m = m
             else:
