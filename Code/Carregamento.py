@@ -121,9 +121,9 @@ class Carregamento():
                 termo_independente = m.subs(self.__x,0) ## Termo independente da função
                 m2 = m.subs(termo_independente,mant2+self.__momento) ## Calcula o segundo fletor subtraindo o termo independente
 
-            if self.__pos == 0: ## Se a força(ou o momento) está no início da barra.
+            if self.__pos == 0: ## Se a força(ou o momento) está no início da barra
                 self.__m = m
-            elif self.__pos == self.__tam: ## Se a força(ou o momento) está no final da barra.
+            elif self.__pos == self.__tam: ## Se a força(ou o momento) está no final da barra
                 self.__m = m
             else:
                 self.__m = m
