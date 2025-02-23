@@ -7,6 +7,7 @@ class MomentoFletor(): ## Construtor da classe
     def __init__(self,carregamentos=[],apoios=[]):
         self.__apoios = [0,0]
         self.__carregamentos = []
+        self.__vxs = []
         self.__mxs = []
         self.__forcasy = []
         self.__momentos = []
@@ -173,11 +174,52 @@ class MomentoFletor(): ## Construtor da classe
         ay = -sum(self.__forcasy)
         self.__apoios[0].set_reacao(ay)
 
-    def imprimeReacoes(self):
-        print("Reações de apoio:")
-        print("Apoio 1: ",self.__apoios[0].get_reacao())
-        if self.__apoios[1] != 0:
-            print("Apoio 2: ",self.__apoios[1].get_reacao())
-        else:
-            print("Momento no apoio 1: ",self.__apoios[0].get_momento())
+    def __append_esforcos(self,i): ## Adicionar os esforços
+        self.__vxs.append(self.__carregamentos[i].get_v()) ## Adiciona cortante
+        self.__mxs.append(self.__carregamentos[i].get_m()) ## Adiciona fletor
+        self.__idCortante+=1
+        self.__idFletor+=1
+        if self.__carregamentos[i].get_tipo() == 2 or self.__carregamentos[i].get_tipo() == 4: ## Carga pontual ou Carga Momento
+            if self.__carregamentos[i].get_tipo() == 2:
+                if self.__carregamentos[i].get_v2() != None:
+                    self.__vxs.append(self.__carregamentos[i].get_v2())
+                    self.__idCortante+=1
+                
+            if self.__carregamentos[i].get_m2() != None:
+                self.__mxs.append(self.__carregamentos[i].get_m2())
+                self.__idFletor+=1
+
+
+    def __set_esforcos(self): ## Define os esforços
+        self.__idCortante = 0
+        self.__idFletor = 0
+
+        self.__vxs.append(0)
+        self.__mxs.append(0)
+
+        for i in range(1,len(self.__carregamentos)): ## Loop para calcular os esforços por partes
+            temApoio = False
+            for apoio in self.__apoios: ## Percorre os apoios
+                if apoio != 0: ## Verifica se o apoio foi definido
+                    if self.__carregamentos[i].get_x1() == apoio.get_pos(): ## Verifica se o início do carregamento está no apoio
+                        temApoio = True
+                        vant = self.__vxs[self.__idCortante] + apoio.get_reacao() ## cortante antes do carregamento somado com a reação do apoio
+                        mant = self.__mxs[self.__idFletor] - apoio.get_momento() ## Fletor antes do carregamento somado com o momento do apoio
+
+            if not temApoio: ## Caso não tenha apoio
+                vant = self.__vxs[self.__idCortante] ## cortante antes do carregamento
+                mant = self.__mxs[self.__idFletor] ## Fletor antes do carregamento
+
+            if self.__carregamentos[i-1].get_tipo() == 2 or self.__carregamentos[i-1].get_tipo() == 4: ## Carga pontual ou Carga Momento
+                self.__carregamentos[i].geraEsforcos(vant,mant,self.__carregamentos[i-1].get_posicao())
+            else: ## Carregamento distribuído e f(X)
+                self.__carregamentos[i].geraEsforcos(vant,mant,self.__carregamentos[i-1].get_x1())
+
+
+            self.__append_esforcos(i)
+        
+    def calcula(self):
+        self.calcularReacoes()
+        self.__set_esforcos()
+
 

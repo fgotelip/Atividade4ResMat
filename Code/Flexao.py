@@ -19,7 +19,8 @@ class Flexao():
         print("Defina os carregamentos.")
         self.__momentoFletor.set_carregamentos()
 
-        self.__momentoInercia.calcula()
-        self.__momentoFletor.calcularReacoes()
+    def exibe_resultados(self):
+        self.__momentoInercia.exibirResultados()
+        self.__momentoFletor.calcula()
 
     
