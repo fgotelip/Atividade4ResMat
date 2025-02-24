@@ -2,7 +2,7 @@ import sympy as sp
 
 ## Classe para definir carregamentos e calcular suas informações
 class Carregamento():
-    def __init__(self, x1=0, x2=0,carga=0,tipo=0,carga2=0,pos=-1): ## Construtor da classe
+    def __init__(self, x1=0, x2=0,carga=0,tipo=0,carga2=0,pos=0): ## Construtor da classe
         self.__x1 = x1
         self.__x2 = x2
         self.__carga = carga
@@ -18,9 +18,9 @@ class Carregamento():
         self.__momento = 0
         self.__w = 0
         self.__v = 0
-        self.__v2 = None
+        self.__v2 = 0
         self.__m = 0
-        self.__m2 = None
+        self.__m2 = 0
         
         if self.__tipo == 1: ## Carregamento distribuído
             if self.__carga == self.__carga2: ## Retângulo
@@ -79,28 +79,17 @@ class Carregamento():
         self.__gera_mx(mant,tamAnt) ## Chama para o calculo do fletor
         print("M1",self.__m)
         if self.__tipo == 2 or self.__tipo == 4:
-            if self.__m2 != None:
-                print("M2",self.__m2)
+            print("M2",self.__m2)
     
     def __gera_vx(self,vant,tamAnt): ## Função para calcular o cortante
+        
         if isinstance(vant,sp.Basic): ## Confere se é função
             vant = vant.subs(self.__x,tamAnt) ## Cortante anterior
 
-        if self.__tipo == 2 or self.__tipo == 4: ## Carregamento pontual ou momento
-            v = vant
-            if self.__tipo == 2: ## Carregamento pontual
-                v2 = vant + self.__resultante ## Segunda cortante 
-                if self.__pos == 0: ## Se a força está no início da barra
-                    self.__v = v2
-                elif self.__pos == self.__tam: ## Se a força está no final da barra
-                    self.__v = v
-                else: 
-                    self.__v = v
-                    self.__v2 = v2
-
-            elif self.__tipo == 4: ## Carga Momento
-                self.__v = v
-
+        if self.__tipo == 2 or self.__tipo == 4: ## Carregamento pontual
+            self.__v = vant
+            if self.__tipo == 2:
+                self.__v2 = vant + self.__resultante  
 
         else: ## Carregamento distribuído e f(X)
             self.__v = sp.integrate(-self.__w,self.__x) + vant
@@ -108,35 +97,16 @@ class Carregamento():
     def __gera_mx(self,mant,tamAnt): ## Função para calcular o fletor
         if isinstance(mant,sp.Basic): ## Confere se é função
             mant = mant.subs(self.__x,tamAnt)
-    
-
-        m = sp.integrate(self.__v,self.__x) + mant
-
-        if self.__tipo == 2 or self.__tipo == 4: ## Carregamento pontual ou momento
-            if self.__v2 != None: ## Se houver segundo cortante
-                mant2 = m.subs(self.__x,self.__pos)
-                m2 = sp.integrate(self.__v2,self.__x) + mant2
-            elif self.__tipo == 4: ## Carga Momento
-                mant2 = m.subs(self.__x,self.__pos)
-                termo_independente = m.subs(self.__x,0) ## Termo independente da função
-                m2 = m.subs(termo_independente,mant2+self.__momento) ## Calcula o segundo fletor subtraindo o termo independente
-
-            if self.__pos == 0: ## Se a força(ou o momento) está no início da barra
-                if self.__v2 == None: ## Se não houver segundo cortante
-                    self.__m = m
-                else: ## Se houver segundo cortante
-                    self.__m = m2
-                    
-            elif self.__pos == self.__tam: ## Se a força(ou o momento) está no final da barra
-                self.__m = m
-            else:
-                self.__m = m
-                self.__m2 = m2
-
-        else: ## Carregamento distribuído e f(X)
-            self.__m = m
         
-        
+        self.__m = sp.integrate(self.__v,self.__x) + mant
+        if self.__tipo == 2: ## Carregamento pontual
+            mant2 = self.__m.subs(self.__x,self.__pos)
+            self.__m2 = sp.integrate(self.__v2,self.__x) + mant2
+
+        elif self.__tipo == 4: ## Carga Momento
+            mant2 = self.__m.subs(self.__x,self.__pos)
+            termo_independente = self.__m.subs(self.__x,0) ## Termo independente da função
+            self.__m2 = self.__m.subs(termo_independente,mant2+self.__momento) ## Calcula o segundo fletor subtraindo o termo independente
 
     def get_tipo(self): ## Retornar o tipo de carregamento
         return self.__tipo

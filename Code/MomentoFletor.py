@@ -181,9 +181,8 @@ class MomentoFletor(): ## Construtor da classe
         self.__idFletor+=1
         if self.__carregamentos[i].get_tipo() == 2 or self.__carregamentos[i].get_tipo() == 4: ## Carga pontual ou Carga Momento
             if self.__carregamentos[i].get_tipo() == 2:
-                if self.__carregamentos[i].get_v2() != None:
-                    self.__vxs.append(self.__carregamentos[i].get_v2())
-                    self.__idCortante+=1
+                self.__vxs.append(self.__carregamentos[i].get_v2())
+                self.__idCortante+=1
                 
             if self.__carregamentos[i].get_m2() != None:
                 self.__mxs.append(self.__carregamentos[i].get_m2())
