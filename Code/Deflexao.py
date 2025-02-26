@@ -1,9 +1,8 @@
 from MomentoDeInercia import MomentoDeInercia
 from MomentoFletor import MomentoFletor
+import sympy as sp
 
-## Classe para executar os calculos previstos para o exercício 2
-## Classe para executar os calculos previstos para o exercício 2
-class Flexao():
+class Deflexao():
     def __init__(self,retangulos=[],buracos=[],carregamentos=[],apoios=[]): ## Construtor da classe
         self.__momentoInercia = MomentoDeInercia()
         self.__momentoFletor = MomentoFletor()
@@ -19,8 +18,14 @@ class Flexao():
         print("Defina os carregamentos.")
         self.__momentoFletor.set_carregamentos()
 
-    def exibe_resultados(self):
-        self.__momentoInercia.exibirResultados()
+    def calcula_constantes(self):
+        self.__momentoInercia.calcula()
         self.__momentoFletor.calcula()
+        
+        E = 200 ## Módulo de elasticidade do material em MPa
+
+
+
+        
 
     

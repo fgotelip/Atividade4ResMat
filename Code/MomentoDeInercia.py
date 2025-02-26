@@ -14,6 +14,9 @@ class MomentoDeInercia:
         self.__Iyy = 0
         self.__Ixy = 0
 
+    def get_Ixx(self): ## Retorna o momento de inércia em X
+        return self.__Ixx
+
     def setRetangulos_user(self): ## função para ler as informações do problema
         numRetangulos = input("Digite o número de retângulos na figura: ")
         while not eh_numero(numRetangulos):

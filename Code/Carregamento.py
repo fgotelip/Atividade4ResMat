@@ -2,111 +2,78 @@ import sympy as sp
 
 ## Classe para definir carregamentos e calcular suas informações
 class Carregamento():
-    def __init__(self, x1=0, x2=0,carga=0,tipo=0,carga2=0,pos=0): ## Construtor da classe
-        self.__x1 = x1
+    def __init__(self,x1=0,x2=0,carga=0,tipo=0,carga2=0,pos=0): ## Construtor da classe
+        self.__x1 =x1
         self.__x2 = x2
         self.__carga = carga
         self.__tipo = tipo
         self.__carga2 = carga2
-        self.__pos = pos
-        self.__tam = x2-x1
-        self.__x = sp.symbols('x')
+        x = sp.symbols('x')
         self.__posicao = 0
         self.__posicao2 = 0
         self.__resultante = 0
         self.__resultante2 = 0
         self.__momento = 0
-        self.__w = 0
-        self.__v = 0
-        self.__v2 = 0
         self.__m = 0
-        self.__m2 = 0
+        tam =self.__x2-self.__x1
+        Heaviside = sp.Heaviside
+      
         
         if self.__tipo == 1: ## Carregamento distribuído
             if self.__carga == self.__carga2: ## Retângulo
-                self.__posicao = (self.__x1 + self.__x2)/2 ## Posição da força resultante
-                self.__resultante = -self.__tam*self.__carga ## Valor da força resultante
-
-                self.__w = self.__carga ## Valor da carga
+                self.__posicao = (self.__x1 +x2)/2 ## Posição da força resultante
+                self.__resultante = -tam*self.__carga ## Valor da força resultante
+                
+                self.__m = -(self.__carga / 2) * (Heaviside(x - self.__x1) * (x - self.__x2)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
 
             elif self.__carga == 0: ## Triângulo Retângulo crescente
-                self.__posicao = self.__x1+(self.__tam*2/3) ## Posição da força resultante
-                self.__resultante = -self.__tam*self.__carga2/2 ## Valor da força resultante
+                self.__posicao =x1+(tam*2/3) ## Posição da força resultante
+                self.__resultante = -tam*self.__carga2/2 ## Valor da força resultante
 
-                self.__w = (self.__carga2/self.__tam)*self.__x ## Valor da carga
+                self.__m = -(self.__carga2 / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) + (self.__carga2 / 2) * Heaviside(x - self.__x2) * (x - self.__x2)**2
+
 
             elif self.__carga2 == 0: ## Triângulo Retângulo decrescente
-                self.__posicao = self.__x1+(self.__tam*1/3) ## Posição da força resultante
-                self.__resultante = -self.__tam*self.__carga/2 ## Valor da força resultante
+                self.__posicao =x1+(tam*1/3) ## Posição da força resultante
+                self.__resultante = -tam*self.__carga/2 ## Valor da força resultante
 
-                self.__w = self.__carga - (self.__carga/self.__tam)*self.__x
+                self.__m = -(self.__carga / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga / 2) * Heaviside(x - self.__x1) * (x - self.__x1)**2
 
             elif self.__carga > self.__carga2: ## Trapézio decrescente
-                self.__posicao = (self.__x1 + self.__x2)/2 ## Posição resultante retângulo
-                self.__resultante = -self.__tam*self.__carga2 ## Valor resultante retângulo
-                self.__posicao2 = self.__x1+(self.__tam*1/3) ## Posição resultante triângulo
-                self.__resultante2 = -self.__tam*(self.__carga-self.__carga2)/2 ## Valor resultante triângulo
+                self.__posicao = (self.__x1 +x2)/2 ## Posição resultante retângulo
+                self.__resultante = -tam*self.__carga2 ## Valor resultante retângulo
+                self.__posicao2 =x1+(tam*1/3) ## Posição resultante triângulo
+                self.__resultante2 = -tam*(self.__carga-self.__carga2)/2 ## Valor resultante triângulo
 
-                self.__w = -((self.__carga-self.__carga2)/self.__tam)*self.__x + self.__carga ## Valor da carga
+                self.__m = -((self.__carga-self.__carga2) / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga2 / 2) * (Heaviside(x - self.__x1) * (x - self.__x1)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
 
             elif self.__carga < self.__carga2: ## Trapézio crescente
-                self.__posicao = (self.__x1 + self.__x2)/2 ## Posição resultante retângulo
-                self.__resultante = -self.__tam*self.__carga ## valor resultante retângulo
-                self.__posicao2 = self.__x1+(self.__tam*2/3) ## Posição resultante triângulo 
-                self.__resultante2 = -self.__tam*(self.__carga2-self.__carga)/2 ## Valor resultante triângulo
+                self.__posicao = (self.__x1 +x2)/2 ## Posição resultante retângulo
+                self.__resultante = -tam*self.__carga ## valor resultante retângulo
+                self.__posicao2 =x1+(tam*2/3) ## Posição resultante triângulo 
+                self.__resultante2 = -tam*(self.__carga2-self.__carga)/2 ## Valor resultante triângulo
 
-                self.__w = ((self.__carga2-self.__carga)/self.__tam)*self.__x + self.__carga ## Valor da carga
+                self.__m = -((self.__carga2 - self.__carga) / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga / 2) * (Heaviside(x - self.__x1) * (x - self.__x1)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
 
         elif self.__tipo == 2: ## Carga pontual
-            self.__posicao = self.__x1+pos ## Posição da força resultante
+            self.__posicao =x1+pos ## Posição da força resultante
             self.__resultante = -self.__carga ## Valor da força resultante
 
+            self.__m = -self.__carga * Heaviside(x - self.__posicao) * (x - self.__posicao)
+
         elif self.__tipo == 3: ## Carregamento por f(X)
-            self.__w = sp.sympify(self.__carga)
-            forca = sp.integrate(self.__w,(self.__x,0,self.__tam)) ## Valor força resultante
+            w = sp.sympify(self.__carga)
+            forca = sp.integrate(w,(self.__x,0,tam)) ## Valor força resultante
             self.__resultante = -float(forca)
-            momento = sp.integrate(self.__w * self.__x,(self.__x, 0, self.__tam)) ## Momento resultante
+            momento = sp.integrate(self.__w *x,(self.__x, 0, tam)) ## Momento resultante
             posicao = float(momento / forca) ## Posição força resultante
-            self.__posicao = self.__x1 + posicao ## Posição resultante em relação a viga toda
+            self.__posicao =x1 + posicao ## Posição resultante em relação a viga toda
         
         elif self.__tipo == 4: ## Carga momento
-            self.__posicao = self.__x1+pos ## Posição do momento
+            self.__posicao =x1+pos ## Posição do momento
             self.__momento = -self.__carga ## Valor do momento
 
-    def geraEsforcos(self,vant,mant,xant=0): ## Função para gerar os esforços na barra
-        tamAnt = self.__x1 - xant 
-        self.__gera_vx(vant,tamAnt) ## Chama para o calculo do cortante 
-        self.__gera_mx(mant,tamAnt) ## Chama para o calculo do fletor
-        print("M1",self.__m)
-        if self.__tipo == 2 or self.__tipo == 4:
-            print("M2",self.__m2)
-    
-    def __gera_vx(self,vant,tamAnt): ## Função para calcular o cortante
-        
-        if isinstance(vant,sp.Basic): ## Confere se é função
-            vant = vant.subs(self.__x,tamAnt) ## Cortante anterior
-
-        if self.__tipo == 2 or self.__tipo == 4: ## Carregamento pontual
-            self.__v = vant
-            if self.__tipo == 2:
-                self.__v2 = vant + self.__resultante  
-
-        else: ## Carregamento distribuído e f(X)
-            self.__v = sp.integrate(-self.__w,self.__x) + vant
-
-    def __gera_mx(self,mant,tamAnt): ## Função para calcular o fletor
-        if isinstance(mant,sp.Basic): ## Confere se é função
-            mant = mant.subs(self.__x,tamAnt)
-        
-        self.__m = sp.integrate(self.__v,self.__x) + mant
-        if self.__tipo == 2: ## Carregamento pontual
-            mant2 = self.__m.subs(self.__x,self.__pos)
-            self.__m2 = sp.integrate(self.__v2,self.__x) + mant2
-
-        elif self.__tipo == 4: ## Carga Momento
-            mant2 = self.__m.subs(self.__x,self.__pos)
-            termo_independente = self.__m.subs(self.__x,0) ## Termo independente da função
-            self.__m2 = self.__m.subs(termo_independente,mant2+self.__momento) ## Calcula o segundo fletor subtraindo o termo independente
+            self.__m = self.__momento * Heaviside(x - self.__posicao)
 
     def get_tipo(self): ## Retornar o tipo de carregamento
         return self.__tipo
@@ -132,17 +99,8 @@ class Carregamento():
     def get_x2(self): ## Retorna o fim do carregamento
         return self.__x2
     
-    def get_v(self): ## Retorna o cortante
-        return self.__v
-    
-    def get_v2(self): ## Retorna o segundo cortante
-        return self.__v2
-    
     def get_m(self): ## Retorna o fletor 
         return self.__m
-    
-    def get_m2(self): ## Retorna o segundo fletor
-        return self.__m2
 
 
 

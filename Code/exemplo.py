@@ -1,7 +1,7 @@
 from Carregamento import Carregamento
 from Apoio import Apoio
 from Retangulo import Retangulo
-from Flexao import Flexao
+from Deflexao import Deflexao
 
 ## Execução principal do exercício 3
 
@@ -12,8 +12,8 @@ apoios = [Apoio(2,2),Apoio(6,1)]
 retangulos=[Retangulo(0,250,0,20),Retangulo(115,135,20,320),Retangulo(0,250,320,340)]
 buracos=[]
 
-flexao = Flexao(retangulos,buracos,carregamentos,apoios)
-flexao.exibe_resultados()
+deflexao = Deflexao(retangulos,buracos,carregamentos,apoios)
+deflexao.calcula_constantes()
 
 '''
 flexao2 = Flexao()

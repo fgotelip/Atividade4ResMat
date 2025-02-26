@@ -1,14 +1,16 @@
 from Carregamento import Carregamento
 from Apoio import Apoio
 from Confere import eh_numero,eh_opcao,eh_funcao,esta_no_intervalo,eh_sim_nao
+import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
 
 ## Classe para ler os carregamentos e calcular informações básicas da viga
 class MomentoFletor(): ## Construtor da classe
     def __init__(self,carregamentos=[],apoios=[]):
         self.__apoios = [0,0]
         self.__carregamentos = []
-        self.__vxs = []
-        self.__mxs = []
+        self.__Mtotal = 0
         self.__forcasy = []
         self.__momentos = []
 
@@ -20,6 +22,9 @@ class MomentoFletor(): ## Construtor da classe
             for carregamento in carregamentos:
                 self.__aux_set_carregamentos(carregamento)
 
+
+    def get_Mtotal(self): ## Retorna o momento total
+        return self.__Mtotal
 
     def __aux_set_carregamentos(self,carregamento): ## Função auxiliar para definir carregamentos
         if carregamento.get_tipo() != 4: ## Caso não seja Carga Momento
@@ -162,7 +167,7 @@ class MomentoFletor(): ## Construtor da classe
             self.__apoios[1]=Apoio(x2,1)
 
 
-    def calcularReacoes(self): ## Função para calcular as reações de apoio
+    def __calcularReacoes(self): ## Função para calcular as reações de apoio
         if self.__apoios[1] != 0:
             dist = self.__apoios[1].get_pos() - self.__apoios[0].get_pos()
             by = -sum(self.__momentos)/dist ## Reação de apoio
@@ -173,52 +178,43 @@ class MomentoFletor(): ## Construtor da classe
 
         ay = -sum(self.__forcasy)
         self.__apoios[0].set_reacao(ay)
-
-    def __append_esforcos(self,i): ## Adicionar os esforços
-        self.__vxs.append(self.__carregamentos[i].get_v()) ## Adiciona cortante
-        self.__mxs.append(self.__carregamentos[i].get_m()) ## Adiciona fletor
-        self.__idCortante+=1
-        self.__idFletor+=1
-        if self.__carregamentos[i].get_tipo() == 2 or self.__carregamentos[i].get_tipo() == 4: ## Carga pontual ou Carga Momento
-            if self.__carregamentos[i].get_tipo() == 2:
-                self.__vxs.append(self.__carregamentos[i].get_v2())
-                self.__idCortante+=1
-                
-            if self.__carregamentos[i].get_m2() != None:
-                self.__mxs.append(self.__carregamentos[i].get_m2())
-                self.__idFletor+=1
-
-
-    def __set_esforcos(self): ## Define os esforços
-        self.__idCortante = 0
-        self.__idFletor = 0
-
-        self.__vxs.append(0)
-        self.__mxs.append(0)
-
-        for i in range(1,len(self.__carregamentos)): ## Loop para calcular os esforços por partes
-            temApoio = False
-            for apoio in self.__apoios: ## Percorre os apoios
-                if apoio != 0: ## Verifica se o apoio foi definido
-                    if self.__carregamentos[i].get_x1() == apoio.get_pos(): ## Verifica se o início do carregamento está no apoio
-                        temApoio = True
-                        vant = self.__vxs[self.__idCortante] + apoio.get_reacao() ## cortante antes do carregamento somado com a reação do apoio
-                        mant = self.__mxs[self.__idFletor] - apoio.get_momento() ## Fletor antes do carregamento somado com o momento do apoio
-
-            if not temApoio: ## Caso não tenha apoio
-                vant = self.__vxs[self.__idCortante] ## cortante antes do carregamento
-                mant = self.__mxs[self.__idFletor] ## Fletor antes do carregamento
-
-            if self.__carregamentos[i-1].get_tipo() == 2 or self.__carregamentos[i-1].get_tipo() == 4: ## Carga pontual ou Carga Momento
-                self.__carregamentos[i].geraEsforcos(vant,mant,self.__carregamentos[i-1].get_posicao())
-            else: ## Carregamento distribuído e f(X)
-                self.__carregamentos[i].geraEsforcos(vant,mant,self.__carregamentos[i-1].get_x1())
-
-
-            self.__append_esforcos(i)
         
-    def calcula(self):
-        self.calcularReacoes()
-        self.__set_esforcos()
+    def __set_MTotal(self): ## Função para calcular o momento total
+        cPontualApoio2genero = Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_reacao(),2,0) ## Carregamento pontual no apoio de 2 genero
+        self.__carregamentos.append(cPontualApoio2genero)
+
+        if self.__apoios[0].get_momento() != 0:
+            cMomentoApoio2genero = Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_momento(),4,0) ## Carregamento momento no apoio de 2 genero
+            self.__carregamentos.append(cMomentoApoio2genero)
+        
+        if self.__apoios[1] != 0:
+            cPontualApoio1genero = Carregamento(self.__apoios[1].get_pos(),self.__apoios[1].get_pos(),self.__apoios[1].get_reacao(),2,0)
+            self.__carregamentos.append(cPontualApoio1genero)
+
+        self.__carregamentos.append(Carregamento())
+        for carregamento in self.__carregamentos:
+            self.__Mtotal += carregamento.get_m()
+
+    def calcula(self): ## Função para calcular as reações e o momento total
+        x = sp.Symbol('x')
+        self.__calcularReacoes()
+        self.__set_MTotal()
+        # Converter para função numérica
+        M_lambdified = sp.lambdify(x, self.__Mtotal, 'numpy')
+
+        # Definir intervalo de x
+        x_vals = np.linspace(0, 6, 1000)
+        M_vals = M_lambdified(x_vals)
+
+        # Plotar o gráfico
+        plt.plot(x_vals, M_vals, label='M(x)', color='blue')
+        plt.xlabel("x (m)")
+        plt.ylabel("Momento Fletor M(x) (kN.m)")
+        plt.title("Diagrama de Momento Fletor")
+        plt.axhline(0, color='black', linewidth=0.8)
+        plt.gca().invert_yaxis()  # Inverter o eixo y para convenção de engenharia
+        plt.grid()
+        plt.legend()
+        plt.show()
 
 
