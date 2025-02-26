@@ -16,7 +16,6 @@ class Carregamento():
         self.__momento = 0
         self.__m = 0
         tam =self.__x2-self.__x1
-        Heaviside = sp.Heaviside
       
         
         if self.__tipo == 1: ## Carregamento distribuído
@@ -24,20 +23,18 @@ class Carregamento():
                 self.__posicao = (self.__x1 +x2)/2 ## Posição da força resultante
                 self.__resultante = -tam*self.__carga ## Valor da força resultante
                 
-                self.__m = -(self.__carga / 2) * (Heaviside(x - self.__x1) * (x - self.__x2)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
-
+                
             elif self.__carga == 0: ## Triângulo Retângulo crescente
                 self.__posicao =x1+(tam*2/3) ## Posição da força resultante
                 self.__resultante = -tam*self.__carga2/2 ## Valor da força resultante
 
-                self.__m = -(self.__carga2 / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) + (self.__carga2 / 2) * Heaviside(x - self.__x2) * (x - self.__x2)**2
-
+                
 
             elif self.__carga2 == 0: ## Triângulo Retângulo decrescente
                 self.__posicao =x1+(tam*1/3) ## Posição da força resultante
                 self.__resultante = -tam*self.__carga/2 ## Valor da força resultante
 
-                self.__m = -(self.__carga / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga / 2) * Heaviside(x - self.__x1) * (x - self.__x1)**2
+               
 
             elif self.__carga > self.__carga2: ## Trapézio decrescente
                 self.__posicao = (self.__x1 +x2)/2 ## Posição resultante retângulo
@@ -45,35 +42,23 @@ class Carregamento():
                 self.__posicao2 =x1+(tam*1/3) ## Posição resultante triângulo
                 self.__resultante2 = -tam*(self.__carga-self.__carga2)/2 ## Valor resultante triângulo
 
-                self.__m = -((self.__carga-self.__carga2) / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga2 / 2) * (Heaviside(x - self.__x1) * (x - self.__x1)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
-
+               
             elif self.__carga < self.__carga2: ## Trapézio crescente
                 self.__posicao = (self.__x1 +x2)/2 ## Posição resultante retângulo
                 self.__resultante = -tam*self.__carga ## valor resultante retângulo
                 self.__posicao2 =x1+(tam*2/3) ## Posição resultante triângulo 
                 self.__resultante2 = -tam*(self.__carga2-self.__carga)/2 ## Valor resultante triângulo
 
-                self.__m = -((self.__carga2 - self.__carga) / (6 * (self.__x2 - self.__x1))) * (Heaviside(x - self.__x1) * (x - self.__x1)**3 - Heaviside(x - self.__x2) * (x - self.__x2)**3) - (self.__carga / 2) * (Heaviside(x - self.__x1) * (x - self.__x1)**2 - Heaviside(x - self.__x2) * (x - self.__x2)**2)
-
+               
         elif self.__tipo == 2: ## Carga pontual
             self.__posicao =x1+pos ## Posição da força resultante
             self.__resultante = -self.__carga ## Valor da força resultante
 
-            self.__m = -self.__carga * Heaviside(x - self.__posicao) * (x - self.__posicao)
-
-        elif self.__tipo == 3: ## Carregamento por f(X)
-            w = sp.sympify(self.__carga)
-            forca = sp.integrate(w,(self.__x,0,tam)) ## Valor força resultante
-            self.__resultante = -float(forca)
-            momento = sp.integrate(self.__w *x,(self.__x, 0, tam)) ## Momento resultante
-            posicao = float(momento / forca) ## Posição força resultante
-            self.__posicao =x1 + posicao ## Posição resultante em relação a viga toda
         
-        elif self.__tipo == 4: ## Carga momento
+        elif self.__tipo == 3: ## Carga momento
             self.__posicao =x1+pos ## Posição do momento
             self.__momento = -self.__carga ## Valor do momento
 
-            self.__m = self.__momento * Heaviside(x - self.__posicao)
 
     def get_tipo(self): ## Retornar o tipo de carregamento
         return self.__tipo

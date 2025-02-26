@@ -27,7 +27,7 @@ class MomentoFletor(): ## Construtor da classe
         return self.__Mtotal
 
     def __aux_set_carregamentos(self,carregamento): ## Função auxiliar para definir carregamentos
-        if carregamento.get_tipo() != 4: ## Caso não seja Carga Momento
+        if carregamento.get_tipo() != 3: ## Caso não seja Carga Momento
             dist = carregamento.get_posicao() - self.__apoios[0].get_pos() ## Distância do carregamento até o apoio
             self.__carregamentos.append(carregamento)
             self.__forcasy.append(carregamento.get_resultante()) ## Soma a força gerada pelo carregamento
@@ -179,42 +179,8 @@ class MomentoFletor(): ## Construtor da classe
         ay = -sum(self.__forcasy)
         self.__apoios[0].set_reacao(ay)
         
-    def __set_MTotal(self): ## Função para calcular o momento total
-        cPontualApoio2genero = Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_reacao(),2,0) ## Carregamento pontual no apoio de 2 genero
-        self.__carregamentos.append(cPontualApoio2genero)
-
-        if self.__apoios[0].get_momento() != 0:
-            cMomentoApoio2genero = Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_momento(),4,0) ## Carregamento momento no apoio de 2 genero
-            self.__carregamentos.append(cMomentoApoio2genero)
-        
-        if self.__apoios[1] != 0:
-            cPontualApoio1genero = Carregamento(self.__apoios[1].get_pos(),self.__apoios[1].get_pos(),self.__apoios[1].get_reacao(),2,0)
-            self.__carregamentos.append(cPontualApoio1genero)
-
-        self.__carregamentos.append(Carregamento())
-        for carregamento in self.__carregamentos:
-            self.__Mtotal += carregamento.get_m()
 
     def calcula(self): ## Função para calcular as reações e o momento total
-        x = sp.Symbol('x')
         self.__calcularReacoes()
-        self.__set_MTotal()
-        # Converter para função numérica
-        M_lambdified = sp.lambdify(x, self.__Mtotal, 'numpy')
-
-        # Definir intervalo de x
-        x_vals = np.linspace(0, 6, 1000)
-        M_vals = M_lambdified(x_vals)
-
-        # Plotar o gráfico
-        plt.plot(x_vals, M_vals, label='M(x)', color='blue')
-        plt.xlabel("x (m)")
-        plt.ylabel("Momento Fletor M(x) (kN.m)")
-        plt.title("Diagrama de Momento Fletor")
-        plt.axhline(0, color='black', linewidth=0.8)
-        plt.gca().invert_yaxis()  # Inverter o eixo y para convenção de engenharia
-        plt.grid()
-        plt.legend()
-        plt.show()
 
 
