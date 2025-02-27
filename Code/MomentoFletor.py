@@ -21,6 +21,7 @@ class MomentoFletor(): ## Construtor da classe
             self.__carregamentos.append(Carregamento())
             for carregamento in carregamentos:
                 self.__aux_set_carregamentos(carregamento)
+            self.__xfinal = carregamentos[-1].get_x2()
 
 
     def get_Mtotal(self): ## Retorna o momento total
@@ -165,22 +166,41 @@ class MomentoFletor(): ## Construtor da classe
 
         if tipo_viga == 1: ## Define os apoios da viga biapoiada simples
             self.__apoios[1]=Apoio(x2,1)
+        self.__xfinal = x2
 
 
     def __calcularReacoes(self): ## Função para calcular as reações de apoio
         if self.__apoios[1] != 0:
             dist = self.__apoios[1].get_pos() - self.__apoios[0].get_pos()
             by = -sum(self.__momentos)/dist ## Reação de apoio
-            self.__apoios[1].set_reacao(by)
-            self.__forcasy.append(self.__apoios[1].get_reacao())
+            self.__apoios[1].set_reacao(-by)
+            self.__forcasy.append(by)
+            self.__carregamentos.append(Carregamento(self.__apoios[1].get_pos(),self.__apoios[1].get_pos(),self.__apoios[1].get_reacao(),2,0)) ## Adiciona a reação de apoio de 1o gênero aos carregamentos
         else: ## Viga engastada
             self.__apoios[0].set_momento(-sum(self.__momentos))
+            self.__carregamentos.append(Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_momento(),3,0)) ## Adiciona o momento de apoio aos carregamentos
 
         ay = -sum(self.__forcasy)
-        self.__apoios[0].set_reacao(ay)
+        self.__apoios[0].set_reacao(-ay)
+
+        self.__carregamentos.append(Carregamento(self.__apoios[0].get_pos(),self.__apoios[0].get_pos(),self.__apoios[0].get_reacao(),2,0)) ## Adiciona a reação de apoio de 2o gênero aos carregamentos
+
         
 
-    def calcula(self): ## Função para calcular as reações e o momento total
-        self.__calcularReacoes()
+    def get_Deflexao(self): ## Retorna o angulo de deflexão e a deflexão
+        self.__calcularReacoes() ## Calcula as reações de apoio
+        teta = 0
+        deflexao = 0
+        for carregamento in self.__carregamentos: ## Loop para percorrer os carregamentos
+            teta += carregamento.get_deflexao(self.__xfinal)[0] ## Adiciona a equação do angulo de deflexão
+            deflexao += carregamento.get_deflexao(self.__xfinal)[1] ## Adiciona a equação de deflexão
+        return teta,deflexao
+    
+    def get_posContorno(self): ## Retorna a posição dos apoios
+        if self.__apoios[0].get_tipo() == 3: ## Se for viga engastada
+            return True,self.__apoios[0].get_pos(),self.__xfinal
+        ## Se não for viga engastada
+        return False,self.__apoios[0].get_pos(),self.__apoios[1].get_pos()
+        
 
 
