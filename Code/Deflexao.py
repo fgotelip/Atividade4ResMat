@@ -1,5 +1,5 @@
 from MomentoDeInercia import MomentoDeInercia
-from MomentoFletor import MomentoFletor
+from EquacoesDeflexao import EquacoesDeflexao
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ x = sp.symbols('x')
 class Deflexao():
     def __init__(self,retangulos=[],buracos=[],carregamentos=[],apoios=[]): ## Construtor da classe
         self.__momentoInercia = MomentoDeInercia()
-        self.__momentoFletor = MomentoFletor()
+        self.__equacoesDeflexao = EquacoesDeflexao()
         self.__C1 = 0
         self.__C2 = 0
         self.__teta = 0
@@ -15,19 +15,19 @@ class Deflexao():
         
         if retangulos != [] and carregamentos != []: ## Condição para testes automatizados
             self.__momentoInercia = MomentoDeInercia(retangulos,buracos)
-            self.__momentoFletor = MomentoFletor(carregamentos,apoios)
+            self.__equacoesDeflexao = EquacoesDeflexao(carregamentos,apoios)
 
     def set_figura(self): ## Função para ler o problema
         print("Defina a área de seção transversal.")
         self.__momentoInercia.setRetangulos_user()
 
         print("Defina os carregamentos.")
-        self.__momentoFletor.set_carregamentos()
+        self.__equacoesDeflexao.set_carregamentos()
 
     def __calcula_constantes(self):
-        self.__teta, self.__deflexao = self.__momentoFletor.get_Deflexao()
+        self.__teta, self.__deflexao = self.__equacoesDeflexao.get_Deflexao()
 
-        ehEngastada, posContorno1,posContorno2 = self.__momentoFletor.get_posContorno() ## Posição de contorno
+        ehEngastada, posContorno1,posContorno2 = self.__equacoesDeflexao.get_posContorno() ## Posição de contorno
 
         ## Cálculo das constantes
         C1 = sp.symbols('C1')
@@ -72,14 +72,14 @@ class Deflexao():
         
         ## angulo de deflexao
         Teta_real = sp.lambdify(x,self.__teta,"numpy")
-        x_vals_teta = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+        x_vals_teta = np.linspace(0,self.__equacoesDeflexao.get_xfinal(),1000)
         y_vals_teta = Teta_real(x_vals_teta)
 
         print("Ângulo de deflexão máximo em módulo: ",max(abs(y_vals_teta)))
 
         ## deflexao
         V_real = sp.lambdify(x,self.__deflexao,"numpy")
-        x_vals_v = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+        x_vals_v = np.linspace(0,self.__equacoesDeflexao.get_xfinal(),1000)
         y_vals_v = V_real(x_vals_v)
 
         print("Deslocamento vertical máximo em módulo: ",max(abs(y_vals_v)))

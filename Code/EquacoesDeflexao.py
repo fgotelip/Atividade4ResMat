@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## Classe para ler os carregamentos e calcular informações básicas da viga
-class MomentoFletor(): ## Construtor da classe
+class EquacoesDeflexao(): ## Construtor da classe
     def __init__(self,carregamentos=[],apoios=[]):
         self.__apoios = [0,0]
         self.__carregamentos = []
