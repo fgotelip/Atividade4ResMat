@@ -57,8 +57,7 @@ class Deflexao():
         I = self.__momentoInercia.get_Ixx() 
 
         E = 200 ## Módulo de elasticidade do material em Pa
-        print (self.__teta)
-        print(self.__deflexao)
+     
         EIm = E*I*10**-6 ## Módulo de elasticidade vezes o momento de inércia em Nm^2
 
         self.__teta = (self.__teta+self.__C1)/(EIm) ## Equação do ângulo de deflexão
@@ -67,57 +66,51 @@ class Deflexao():
         #print(self.__deflexao*E*I)
 
 
-    def plot_deflexao(self,grafico=True):
+    def plot_deflexao(self):
         self.__calcula_constantes()
         self.__gera_equacao_deflexao()
         
-        if grafico:
-            '''Teta_real = sp.lambdify(x,self.__teta,"numpy")
-            x_vals = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
-            y_vals = Teta_real(x_vals)
+        ## angulo de deflexao
+        Teta_real = sp.lambdify(x,self.__teta,"numpy")
+        x_vals_teta = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+        y_vals_teta = Teta_real(x_vals_teta)
 
-            plt.figure(figsize=(10, 5))
-            plt.plot(x_vals, y_vals, label=r'$\theta(x)$', color='b', linewidth=2)
+        print("Ângulo de deflexão máximo em módulo: ",max(abs(y_vals_teta)))
 
-            x_max = max(x_vals)
-            y_max = Teta_real(x_max)
-            plt.scatter(x_max, y_max, color='r', zorder=3, label=f'Máximo ({x_max:.2f}, {y_max:.2f})')
-            plt.annotate(f'({x_max:.2f}, {y_max:.2f})', xy=(x_max, y_max), xytext=(x_max + 0.1, y_max),
-                        arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=10, color='red')
-            plt.xlabel("x (m)")
-            plt.ylabel(r"$\theta$ (rad)")
-            plt.title("Gráfico da Deflexão Angular $\theta(x)$")
-            plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
-            plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
-            plt.grid(True, linestyle="--", alpha=0.7)
-            plt.legend()
-            plt.gca().invert_yaxis()
-            
-            plt.show()'''
+        ## deflexao
+        V_real = sp.lambdify(x,self.__deflexao,"numpy")
+        x_vals_v = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+        y_vals_v = V_real(x_vals_v)
 
-            V_real = sp.lambdify(x,self.__deflexao,"numpy")
-            x_vals = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
-            y_vals = V_real(x_vals)
+        print("Deslocamento vertical máximo em módulo: ",max(abs(y_vals_v)))
 
-            print(V_real(0))
-            print(max(abs(y_vals)))
+        ## plota angulo de deflexao
+        plt.figure(figsize=(10, 5))
+        plt.plot(x_vals_teta,y_vals_teta, label=r'$\theta(x)$', color='b', linewidth=2)
 
-            plt.figure(figsize=(10, 5))
-            plt.plot(x_vals, y_vals, label=r'$v(x)$', color='b', linewidth=2)
+        plt.xlabel("x (m)")
+        plt.ylabel(r"$\theta$ (rad)")
+        plt.title("Gráfico da Deflexão Angular $\theta(x)$")
+        plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+        plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
+        plt.grid(True, linestyle="--", alpha=0.7)
+        plt.legend()
+        
+        plt.show()
 
-            '''plt.scatter(x_max, y_max, color='r', zorder=3, label=f'Máximo ({x_max:.2f}, {y_max:.2f})')
-            plt.annotate(f'({x_max:.2f}, {y_max:.2f})', xy=(x_max, y_max), xytext=(x_max + 0.1, y_max),
-                        arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=10, color='red')'''
-            
-            plt.xlabel("x (m)")
-            plt.ylabel(r"$v$ (m)")
-            plt.title("Gráfico da Deflexão $v(x)$")
-            plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
-            plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
-            plt.grid(True, linestyle="--", alpha=0.7)
-            plt.legend()
+        ## plota deflexao
+        plt.figure(figsize=(10, 5))
+        plt.plot(x_vals_v,y_vals_v, label=r'$v(x)$', color='b', linewidth=2)
+        
+        plt.xlabel("x (m)")
+        plt.ylabel(r"$v$ (m)")
+        plt.title("Gráfico da Deflexão $v(x)$")
+        plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+        plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
+        plt.grid(True, linestyle="--", alpha=0.7)
+        plt.legend()
 
-            plt.show()
+        plt.show()
             
 
 

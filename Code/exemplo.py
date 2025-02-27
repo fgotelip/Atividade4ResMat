@@ -3,20 +3,29 @@ from Apoio import Apoio
 from Retangulo import Retangulo
 from Deflexao import Deflexao
 
-## Execução principal do exercício 3
-
-#T3
-#carregamentos = [ Carregamento(0,1.5,100,1,100),Carregamento(1.5,2,-20,3,0,0.25),Carregamento(2,3,40,3,0,1),Carregamento(3,3.75,0,1,150),Carregamento(3.75,4,30,2,0,0),Carregamento(4,5,100,1,10),Carregamento(5,6,30,2,0,0.75)]
-carregamentos = [ Carregamento(0,3,-15,3,0,3),Carregamento(3,6,30,1,60)]
-apoios = [Apoio(0,2),Apoio(6,1)]
 retangulos=[Retangulo(0,100,0,100)]
 buracos=[]
 
-deflexao = Deflexao(retangulos,buracos,carregamentos,apoios)
-deflexao.plot_deflexao()
+'''carregamentos1 = [ Carregamento(0,5,150,1,150),Carregamento(5,5,-100,3),Carregamento(5,9,110,2,0,4)]
+apoios1 = [Apoio(0,3),0]
 
+deflexao1 = Deflexao(retangulos,buracos,carregamentos1,apoios1)
+deflexao1.plot_deflexao()
 '''
-flexao2 = Flexao()
-flexao2.set_figura()
-flexao2.exibe_resultados()
-'''
+
+'''carregamentos2 = [ Carregamento(0,3,-15,3,0,3),Carregamento(3,6,30,1,60)]
+apoios2 = [Apoio(0,2),Apoio(6,1)]
+
+deflexao2 = Deflexao(retangulos,buracos,carregamentos2,apoios2)
+deflexao2.plot_deflexao()'''
+
+'''carregamentos3 = [Carregamento(0,4,30,2),Carregamento(4,6,50,1,50)]
+apoios3 = [Apoio(2,2),Apoio(6,1)]
+
+deflexao3 = Deflexao(retangulos,buracos,carregamentos3,apoios3)
+deflexao3.plot_deflexao()'''
+
+
+deflexao4 = Deflexao()
+deflexao4.set_figura()
+deflexao4.plot_deflexao()
