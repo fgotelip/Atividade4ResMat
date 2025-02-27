@@ -107,9 +107,9 @@ class MomentoFletor(): ## Construtor da classe
             x2=x1+tam ## Final da barra inserida
             x2Ant = x2
 
-            opcao = input("Como é dada a distribuição de cargas?\n1-Carga Distribuída\n2-Carga Pontual\n3-Função\n4-Carga Momento\n: ") ## Diferentes tipos de carregamento
-            while not eh_opcao(opcao,1234):
-                opcao = input("Como é dada a distribuição de cargas?\n1-Carga Distribuída\n2-Carga Pontual\n3-Função\n4-Carga Momento\n: ")
+            opcao = input("Como é dada a distribuição de cargas?\n1-Carga Distribuída\n2-Carga Pontual\n3-Carga Momento\n: ") ## Diferentes tipos de carregamento
+            while not eh_opcao(opcao,123):
+                opcao = input("Como é dada a distribuição de cargas?\n1-Carga Distribuída\n2-Carga Pontual\n3-Carga Momento\n: ")
             self.__opcao = int(opcao)
 
             if self.__opcao == 1: ## Carregamento distribuido
@@ -139,16 +139,9 @@ class MomentoFletor(): ## Construtor da classe
                     pos = 0
                 self.__aux_set_carregamentos(Carregamento(x1,x2,carga,self.__opcao,0,pos))
 
-            elif self.__opcao == 3: ## Função f(X)
-                funcao = input("Insira a função de distribuição (Ex: 100 + 10*x): ")
-                while not eh_funcao(funcao):
-                    funcao = input("Insira a função de distribuição (Ex: 100 + 10*x): ")
-
-                self.__aux_set_carregamentos(Carregamento(x1,x2,funcao,self.__opcao))
-
-            elif self.__opcao == 4: ## Carga Momento
+            elif self.__opcao == 3: ## Carga Momento
                 carga = input("Carga Momento = ")
-                while not eh_numero(carga):
+                while not eh_numero(carga,False,True):
                     carga = input("Carga Momento =  ")
                 carga = float(carga)
 

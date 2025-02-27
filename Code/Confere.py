@@ -59,6 +59,7 @@ def eh_funcao(funcao): ## Função para verificar se a inserção é uma funçã
 
 def esta_no_intervalo(valor,limite_inferior,limite_superior): ## Função para verificar se um valor está dentro de um intervalo
     if eh_numero(valor,True):
+        valor = float(valor)
         if valor >= limite_inferior and valor <= limite_superior:
             return True
         print("O valor digitado não atende os limites da barra.")
