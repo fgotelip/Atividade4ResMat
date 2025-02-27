@@ -79,15 +79,15 @@ class Carregamento():
             self.__posicao =x1+pos ## Posição da força resultante
             self.__resultante = -self.__carga ## Valor da força resultante
 
-            self.__teta = -self.__carga*(self.__x-self.__x1)**2/2 ## Angulo de deflexão
-            self.__v = -self.__carga*(self.__x-self.__x1)**3/6 ## Deflexão
+            self.__teta = -self.__carga*(self.__x-self.__posicao)**2/2 ## Angulo de deflexão
+            self.__v = -self.__carga*(self.__x-self.__posicao)**3/6 ## Deflexão
 
         elif self.__tipo == 3: ## Carga momento
             self.__posicao =x1+pos ## Posição do momento
             self.__momento = self.__carga ## Valor do momento
 
-            self.__teta = -self.__momento*(self.__x-self.__x1) ## Angulo de deflexão
-            self.__v = -self.__momento*(self.__x-self.__x1)**2/2 ## Deflexão
+            self.__teta = -self.__momento*(self.__x-self.__posicao) ## Angulo de deflexão
+            self.__v = -self.__momento*(self.__x-self.__posicao)**2/2 ## Deflexão
     
     def __calcula_deflexao_carregamento_deslocado(self): ## Calcula a deflexão para carregamento deslocado
         if self.__tipo == 1: ## Carregamento distribuído
@@ -109,10 +109,10 @@ class Carregamento():
 
     def get_deflexao(self,xfinal): ## Retornar o angulo de deflexão e a deflexão
         if xfinal != self.__x2: ## Se o carregamento for deslocado
-            self.__calcula_deflexao_carregamento_deslocado(self.__x2) ## Calcula a deflexão para carregamento deslocado
+            self.__calcula_deflexao_carregamento_deslocado() ## Calcula a deflexão para carregamento deslocado
         
         if self.__tipo == 2 or self.__tipo == 3: ## Se for carga pontual ou momento
-            if xfinal == self.__x2: ## Se estiver no final da viga
+            if self.__posicao == xfinal: ## Se estiver no final da viga
                 self.__teta = 0
                 self.__v = 0
 

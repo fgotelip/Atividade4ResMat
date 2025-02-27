@@ -1,6 +1,8 @@
 from MomentoDeInercia import MomentoDeInercia
 from MomentoFletor import MomentoFletor
 import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
 x = sp.symbols('x')
 class Deflexao():
     def __init__(self,retangulos=[],buracos=[],carregamentos=[],apoios=[]): ## Construtor da classe
@@ -23,14 +25,9 @@ class Deflexao():
         self.__momentoFletor.set_carregamentos()
 
     def __calcula_constantes(self):
-        self.__momentoInercia.calcula() ## Calcula o momento de inércia
-        I = self.__momentoInercia.get_Ixx() 
-
         self.__teta, self.__deflexao = self.__momentoFletor.get_Deflexao()
 
         ehEngastada, posContorno1,posContorno2 = self.__momentoFletor.get_posContorno() ## Posição de contorno
-
-        E = 200 ## Módulo de elasticidade do material em MPa
 
         ## Cálculo das constantes
         C1 = sp.symbols('C1')
@@ -38,7 +35,7 @@ class Deflexao():
 
         if ehEngastada:
             self.__C1 = 0
-            self.__C2 = -self.__deflexao.subs(x,posContorno2) ## Substitui o tamanho da viga na deflexão
+            self.__C2 = 0
         else: ## Se a viga for biapoiada
             if posContorno1 == 0 or posContorno2 == 0: ## Se o apoio de 2 ou 1 genero estiver no inicio da viga
                 self.__C2 = 0
@@ -56,15 +53,72 @@ class Deflexao():
                 self.__C2 = sol[C2]
     
     def __gera_equacao_deflexao(self):
-        self.__teta += self.__C1
-        self.__deflexao += self.__C1*x + self.__C2
+        self.__momentoInercia.calcula() ## Calcula o momento de inércia
+        I = self.__momentoInercia.get_Ixx() 
+
+        E = 200 ## Módulo de elasticidade do material em Pa
+        print (self.__teta)
+        print(self.__deflexao)
+        EIm = E*I*10**-6 ## Módulo de elasticidade vezes o momento de inércia em Nm^2
+
+        self.__teta = (self.__teta+self.__C1)/(EIm) ## Equação do ângulo de deflexão
+        
+        self.__deflexao = (self.__deflexao + self.__C1*x + self.__C2)/(EIm) ## Equação da deflexão
+        #print(self.__deflexao*E*I)
 
 
-    def plot_deflexao(self):
+    def plot_deflexao(self,grafico=True):
         self.__calcula_constantes()
         self.__gera_equacao_deflexao()
-
         
+        if grafico:
+            '''Teta_real = sp.lambdify(x,self.__teta,"numpy")
+            x_vals = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+            y_vals = Teta_real(x_vals)
+
+            plt.figure(figsize=(10, 5))
+            plt.plot(x_vals, y_vals, label=r'$\theta(x)$', color='b', linewidth=2)
+
+            x_max = max(x_vals)
+            y_max = Teta_real(x_max)
+            plt.scatter(x_max, y_max, color='r', zorder=3, label=f'Máximo ({x_max:.2f}, {y_max:.2f})')
+            plt.annotate(f'({x_max:.2f}, {y_max:.2f})', xy=(x_max, y_max), xytext=(x_max + 0.1, y_max),
+                        arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=10, color='red')
+            plt.xlabel("x (m)")
+            plt.ylabel(r"$\theta$ (rad)")
+            plt.title("Gráfico da Deflexão Angular $\theta(x)$")
+            plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+            plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
+            plt.grid(True, linestyle="--", alpha=0.7)
+            plt.legend()
+            plt.gca().invert_yaxis()
+            
+            plt.show()'''
+
+            V_real = sp.lambdify(x,self.__deflexao,"numpy")
+            x_vals = np.linspace(0,self.__momentoFletor.get_xfinal(),1000)
+            y_vals = V_real(x_vals)
+
+            print(V_real(0))
+            print(max(abs(y_vals)))
+
+            plt.figure(figsize=(10, 5))
+            plt.plot(x_vals, y_vals, label=r'$v(x)$', color='b', linewidth=2)
+
+            '''plt.scatter(x_max, y_max, color='r', zorder=3, label=f'Máximo ({x_max:.2f}, {y_max:.2f})')
+            plt.annotate(f'({x_max:.2f}, {y_max:.2f})', xy=(x_max, y_max), xytext=(x_max + 0.1, y_max),
+                        arrowprops=dict(facecolor='red', arrowstyle='->'), fontsize=10, color='red')'''
+            
+            plt.xlabel("x (m)")
+            plt.ylabel(r"$v$ (m)")
+            plt.title("Gráfico da Deflexão $v(x)$")
+            plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+            plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
+            plt.grid(True, linestyle="--", alpha=0.7)
+            plt.legend()
+
+            plt.show()
+            
 
 
 

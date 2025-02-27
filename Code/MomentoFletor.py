@@ -192,8 +192,9 @@ class MomentoFletor(): ## Construtor da classe
         teta = 0
         deflexao = 0
         for carregamento in self.__carregamentos: ## Loop para percorrer os carregamentos
-            teta += carregamento.get_deflexao(self.__xfinal)[0] ## Adiciona a equação do angulo de deflexão
-            deflexao += carregamento.get_deflexao(self.__xfinal)[1] ## Adiciona a equação de deflexão
+            tetai,deflexaoi = carregamento.get_deflexao(self.__xfinal)
+            teta += tetai
+            deflexao += deflexaoi
         return teta,deflexao
     
     def get_posContorno(self): ## Retorna a posição dos apoios
@@ -201,6 +202,9 @@ class MomentoFletor(): ## Construtor da classe
             return True,self.__apoios[0].get_pos(),self.__xfinal
         ## Se não for viga engastada
         return False,self.__apoios[0].get_pos(),self.__apoios[1].get_pos()
+    
+    def get_xfinal(self):
+        return self.__xfinal
         
 
 
